@@ -64,7 +64,7 @@ Instalação completa!
 
 Para fazer de fato a liberação das recargas você terá duas rotas: POST e GET
 
-#### POST - Processo de liberação
+#### POST - Criando processo de liberação
 
 O modelo para se fazer a criação é um palyload em JSON para a rota: POST - http://localhost:3000/topups
 
