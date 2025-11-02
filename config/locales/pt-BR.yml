@@ -1,0 +1,23 @@
+pt-BR:
+  activerecord:
+    errors:
+      models:
+        topup:
+          attributes:
+            external_id:
+              blank: 'não pode ficar em branco'
+            phone_number:
+              blank: 'não pode ser vazio'
+            amount:
+              blank: 'tem que ser maior que 0 e diferente de vazio'
+              not_a_number: 'tem que ser número'
+      messages:
+        record_invalid: 'A validação falhou: %{errors}'
+  errors:
+    messages:
+      external_id_not_blank: 'External_id não ficar em branco'
+      phone_number_not_blank: 'Número de telefone não pode ser vazio'
+      amount_not_blank: 'O valor tem que ser maior que 0 e diferente de vazio'
+      idempotency_conflict: 'Conflito de idempotência'
+      unexpected_error: 'Erro inesperado: %{error}'
+      taken: 'já existe'

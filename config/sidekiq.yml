@@ -1,0 +1,16 @@
+default: &defaults
+  :verbose: true
+  :queues:
+    - ["critical", 10]
+    - ["high", 5]
+    - ["medium", 3]
+    - ["low", 2]
+    - ["default", 1]
+  :concurrency: <%= ENV['SIDEKIQ_CONCURRENCY']%>
+
+production:
+  <<: *defaults
+
+development:
+  <<: *defaults
+  :logfile: ./log/sidekiq.log

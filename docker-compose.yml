@@ -1,0 +1,79 @@
+version: "3.9"
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  gem-data:
+    driver: local
+
+services:
+  db:
+    container_name: bmb.api.db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    container_name: bmb.api.redis
+    image: redis:latest
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+
+  app:
+    container_name: bmd.api.app
+    build: .
+    image: bmb-api_app
+    environment:
+      RAILS_ENV: ${RAILS_ENV}
+      RACK_ENV: ${RACK_ENV}
+      DISABLE_SPRING: 1
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: '${REDIS_URL}'
+    command: bundle exec puma -C config/puma.rb
+    volumes:
+      - '.:/usr/src/app'
+      - gem-data:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    stdin_open: true
+    env_file: .env
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    container_name: bmb.api.worker
+    image: bmb-api_app
+    environment:
+      RAILS_ENV: ${RAILS_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: '${REDIS_URL}'
+    command: bundle exec sidekiq -c 4 -v --verbose
+    volumes:
+      - '.:/usr/src/app'
+      - gem-data:/usr/local/bundle
+    depends_on:
+      - db
+      - redis
+    stdin_open: true
+    env_file: .env
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    driver: bridge
