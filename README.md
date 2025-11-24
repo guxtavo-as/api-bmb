@@ -157,4 +157,7 @@ Para manter a idempotência foi criado:
 
 ### Testes
 
-Não foram feitos testes apesar de ter sido instalado gem específicas para utilização.
+Para execuar o testes basta executar o comando:
+```
+docker-compose run --rm app bundle exec rspec
+```
