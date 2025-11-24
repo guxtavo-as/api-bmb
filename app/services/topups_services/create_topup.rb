@@ -3,9 +3,9 @@ module TopupsServices
     attr_reader :topup, :errors, :http_status
 
     def initialize(params)
-      @external_id = params['external_id']
-      @phone_number = params['phone_number']
-      @amount = params['product']['amount']
+      @external_id = params[:external_id]
+      @phone_number = params[:phone_number]
+      @product = params[:product]
       @params = params
       @errors = []
     end
@@ -17,7 +17,7 @@ module TopupsServices
     def call
       @errors << I18n.t('errors.messages.external_id_not_blank') if @external_id.blank?
       @errors << I18n.t('errors.messages.phone_number_not_blank') if @phone_number.blank?
-      @errors << I18n.t('errors.messages.amount_not_blank') if @amount.blank?
+      @errors << I18n.t('errors.messages.amount_not_blank') if @product['amount'].blank?
 
       return self unless @errors.blank?
 
@@ -27,11 +27,12 @@ module TopupsServices
 
       self
     rescue ActiveRecord::RecordNotUnique
-      exist = Topup.find_by(external_id: @external_id)
-      return exist if exist
-
-      @errors << I18n.t('errors.messages.idempotency_conflict')
-      self
+      existing = Topup.find_by(external_id: @external_id)
+      if existing
+        @topup = existing
+        @errors << I18n.t('errors.messages.idempotency_conflict')
+        self
+      end
     rescue StandardError => e
       @errors << I18n.t('errors.messages.unexpected_error', error: e.message)
       self
@@ -43,9 +44,9 @@ module TopupsServices
       Topup.create!(
         external_id: @external_id,
         phone_number: @phone_number,
-        amount: @amount,
+        amount: @product['amount'],
         request_payload: @params,
-        status: @params['status']
+        status: @params[:status]
       )
     end
   end

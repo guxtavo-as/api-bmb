@@ -1,6 +1,4 @@
 class TopupsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create]
-
   def show
     topup = Topup.find(params[:id])
 
@@ -20,6 +18,12 @@ class TopupsController < ApplicationController
   private
 
   def topup_params
-    params.permit!
+    params.permit(
+      :external_id,
+      :phone_number,
+      :status,
+      product: [:id, :unit, :amount],
+      customer: [:id]
+    ).to_h.symbolize_keys
   end
 end

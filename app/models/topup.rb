@@ -21,7 +21,7 @@ class Topup < ApplicationRecord
   end
 
   def mark_failed!(error_message, response_payload)
-    update(status: :falied, error_message: error_message, response_payload: response_payload)
+    update(status: :failed, error_message: error_message, response_payload: response_payload)
   end
 
   private
